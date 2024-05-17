@@ -837,6 +837,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Entitlement Set
     post:
       description: Adds an entitlement set.
       operationId: post-consumer-risk-entitlements-entitlement-set
@@ -1047,6 +1048,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: User Entitlement 
     post:
       description: Adds an entitlement on the user level.
       operationId: post-consumer-risk-entitlements-user
@@ -1294,6 +1296,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Endpoints Promote
   /provider/risk/v1/entitlements/endpoints/promote:
     post:
       description: 'Promotes endpoint catalog entries matching the `service` and `version` parameters supplied setting `active: true`. After promoting the new entires it will delete all old entries matching the `service` parameter supplied but not matching the `version` parameter supplied.'
@@ -1386,6 +1389,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: System Entitlement
     post:
       description: Adds an entitlement on the system level.
       operationId: post-provider-risk-entitlements-system
@@ -1621,6 +1625,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Tenant Entitlement
     post:
       description: Adds an entitlement on the tenant level.
       operationId: post-provider-risk-entitlements-tenant
@@ -1870,6 +1875,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Organization Entitlement 
     post:
       description: Adds an entitlement on the organization level.
       operationId: post-tenant-risk-entitlements-organization
@@ -2107,6 +2113,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Entitlement Segment
     post:
       description: Adds an entitlement on the segment level.
       operationId: post-tenant-risk-entitlements-segment
