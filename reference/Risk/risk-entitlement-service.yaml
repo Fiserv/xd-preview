@@ -1,0 +1,2014 @@
+components:
+  responses:
+    303seeOther:
+      description: The requested operation is not allowed because the resource already exists. The server is redirecting the caller to the existing resource, as indicated by a URI in the Location header field.
+    400badRequest:
+      description: The request could not be processed by the server. This may be due to malformed syntax or a semantic error (e.g., they failed validation for length, range, etc.). Check your parameters and retry.
+    401unauthorized:
+      description: The client has not authenticated to perform the operation.
+    403forbidden:
+      description: The authenticated client is not authorized to perform the operation.
+    404notFound:
+      description: The server has not found a resource matching the request URI. The resource may no longer be available or the resource identifier(s) were incorrect.
+    422unprocessableEntity:
+      description: The parameters were syntactically correct, but they could not be processed by the server. Check your parameters and try again.
+  schemas:
+    amount:
+      additionalProperties: false
+      description: The amount of money associated with a balance or transaction.
+      properties:
+        currency:
+          $ref: '#/components/schemas/currencyCode'
+        value:
+          description: A number of monetary units specified in an active currency where the unit of currency is explicit and compliant with ISO 4217.
+          example: 1000
+          type: number
+      required:
+        - currency
+        - value
+      type: object
+    currencyCode:
+      description: ISO 4217 currency code.
+      example: USD
+      pattern: ^[A-Z]{3,3}$
+      type: string
+    entitlementPatch:
+      description: Properties that can be updated on an entitlement.
+      properties:
+        allow:
+          description: Indicates whether the entitlement, when the criteria are met, allows or denies access.
+          example: true
+          type: boolean
+        description:
+          description: Human-readable text that explains the purpose of the entitlement. This may be used in UI to help entitlement management but is not localized.
+          example: Transfer Limits
+          type: string
+        limitGroups:
+          items:
+            $ref: '#/components/schemas/limitGroup'
+          type: array
+        method:
+          description: The HTTP method associated with the request. Used to differentiate entitlements on a per-endpoint basis.
+          enum:
+            - CONNECT
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+            - TRACE
+          example: POST
+          type: string
+        name:
+          description: A short name for the entitlement. This may be used in UI to help entitlement management but is not localized.
+          example: System Transfer Limit
+          type: string
+        request:
+          description: Restrictions that can match and be evaluated against aspects of the inbound request.
+          example:
+            - conditions:
+                and:
+                  - name: transfer.type
+                    operator: in
+                    source: fields
+                    values:
+                      - PPD
+              validations:
+                - name: transfer.amount
+                  operator: range
+                  range:
+                    max: 1000
+                  target: fields
+            - validations:
+                - name: amount.value
+                  operator: required
+                  target: fields
+                  value: 'true'
+          items:
+            $ref: '#/components/schemas/restriction'
+          type: array
+        route:
+          description: The route pattern that matches the request path with which the entitlement is associated.
+          example: /consumer/banking/v1/transfers
+          format: path
+          type: string
+        scope:
+          description: The level at which the entitlement takes effect.
+          enum:
+            - system
+            - tenant
+            - segment
+            - organization
+            - user
+          example: system
+          type: string
+        type:
+          allOf:
+            - $ref: '#/components/schemas/entitlementType'
+          description: Indicates the type of entitlement it is, see enum for possible values.
+          example: entitlement
+      type: object
+    entitlementSet:
+      description: An entitlement set containing one or more user ID references and one or more entitlement references.
+      properties:
+        description:
+          example: Helpful text explaining the purpose of this policy.
+          type: string
+        entitlements:
+          example:
+            - 7c2cbc3a-115d-468c-845e-e859b1135c2a
+          items:
+            description: An array of entitlement IDs that makes up the entitlement set.
+            type: string
+          type: array
+        name:
+          example: XYZ Corp Custom Policy
+          type: string
+        organizationId:
+          example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+          format: guid
+          type: string
+        type:
+          allOf:
+            - $ref: '#/components/schemas/entitlementType'
+          description: Indicates the type of entitlement it is, see enum for possible values.
+          example: entitlementSet
+        users:
+          example:
+            - ffa5e183-94ec-4419-84e2-9919b5fc6763
+          items:
+            description: An array of user IDs to which the entitlements applies.
+            type: string
+          type: array
+      type: object
+    entitlementSetArray:
+      description: An array of entitlement sets.
+      items:
+        $ref: '#/components/schemas/entitlementSetWithId'
+      type: array
+    entitlementSetWithId:
+      allOf:
+        - $ref: '#/components/schemas/entitlementSet'
+      description: An entitlement set with an associated ID.
+      properties:
+        id:
+          example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+          format: guid
+          type: string
+      type: object
+    entitlementType:
+      description: Indicates which type of entitlement it is. `entitlement` for regular entitlement, and `entitlementset` for entitlements that are part of an entitlement set.
+      enum:
+        - entitlement
+        - entitlementSet
+        - entitlementSetMember
+      type: string
+    frequency:
+      description: The amount of time associated with the limit. For example, if the value is 'daily' then the limit amount applies to a 24-hour period.
+      enum:
+        - daily
+        - weekly
+        - monthly
+        - quarterly
+        - yearly
+        - settlementDay
+        - perOccurrence
+        - perBatch
+      example: daily
+      type: string
+    jsonPatchDocument:
+      description: RFC 6902 JSON Patch document - http://json.schemastore.org/json-patch
+      items:
+        oneOf:
+          - additionalProperties: false
+            description: Add, replace, or test operations.
+            properties:
+              op:
+                description: The operation to perform.
+                enum:
+                  - add
+                  - replace
+                  - test
+                type: string
+              path:
+                $ref: '#/components/schemas/jsonPatchPath'
+              value:
+                description: The value to add, replace, or test.
+            required:
+              - op
+              - path
+              - value
+            type: object
+          - additionalProperties: false
+            description: Remove operation.
+            properties:
+              op:
+                description: The operation to perform.
+                enum:
+                  - remove
+                type: string
+              path:
+                $ref: '#/components/schemas/jsonPatchPath'
+            required:
+              - op
+              - path
+            type: object
+          - additionalProperties: false
+            description: Copy and move operations.
+            properties:
+              from:
+                $ref: '#/components/schemas/jsonPatchPath'
+              op:
+                description: The operation to perform.
+                enum:
+                  - copy
+                  - move
+                type: string
+              path:
+                $ref: '#/components/schemas/jsonPatchPath'
+            required:
+              - from
+              - op
+              - path
+            type: object
+      type: array
+    jsonPatchPath:
+      description: A JSON Pointer path pointing to the location of the patch operation.
+      type: string
+    limit:
+      description: Criteria defining a transaction limit within a given period of time.
+      properties:
+        conditions:
+          description: Contains the collection of conditions that must be met in order for the rule to be applied.
+          properties:
+            and:
+              items:
+                $ref: '#/components/schemas/operator'
+              type: array
+            or:
+              items:
+                $ref: '#/components/schemas/operator'
+              type: array
+          type: object
+        period:
+          $ref: '#/components/schemas/frequency'
+        rules:
+          items:
+            $ref: '#/components/schemas/rule'
+          type: array
+      type: object
+    limitGroup:
+      description: Criteria defining a transaction limit within a given period of time.
+      example:
+        limits:
+          - conditions:
+              and:
+                - name: transfer.type
+                  operator: in
+                  values:
+                    - PPD
+            period: daily
+            rules:
+              - aggregator: sum
+                amount:
+                  currency: USD
+                  value: 500
+                name: amount
+          - conditions:
+              and:
+                - name: transfer.Type
+                  operator: in
+                  values:
+                    - CCD
+                    - CTX
+                    - RCK
+                    - IAT
+            period: daily
+            rules:
+              - aggregator: sum
+                amount:
+                  currency: USD
+                  value: 1000
+                name: amount
+              - aggregator: count
+                name: noOfTransfers
+                value: 100
+        scheme: transfer
+      properties:
+        limits:
+          description: The strongly typed limit and it's values.
+          items:
+            $ref: '#/components/schemas/limit'
+          type: array
+        scheme:
+          description: The scheme of the limit, this defines which strong type it translates to. Each service has it's own distinct strong type.
+          example: transfer
+          type: string
+      required:
+        - scheme
+      type: object
+    operator:
+      description: Operator for restrictions and conditions.
+      properties:
+        name:
+          example: transfer.amount
+          type: string
+        operator:
+          enum:
+            - equals
+            - range
+            - in
+            - required
+          example: range
+          type: string
+        range:
+          description: Defines the number range that the value being validated should fall within.
+          properties:
+            max:
+              example: 1000
+              type: number
+            min:
+              example: 100
+              type: number
+          type: object
+        source:
+          enum:
+            - fields
+            - headers
+            - parameters
+          example: fields
+          type: string
+        target:
+          enum:
+            - fields
+            - headers
+            - parameters
+          example: fields
+          type: string
+        value:
+          example: 'true'
+          type: string
+        values:
+          example:
+            - Test-Group
+          items:
+            type: string
+          type: array
+      required:
+        - name
+        - operator
+      type: object
+    organizationEntitlement:
+      allOf:
+        - $ref: '#/components/schemas/entitlementPatch'
+        - description: An entitlement associated with an organization.
+          properties:
+            organizationId:
+              description: ID of the organization this entitlement belongs to.
+              example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+              type: string
+            scope:
+              example: organization
+              type: string
+          type: object
+      description: An entitlement set at the organization level.
+      required:
+        - allow
+        - method
+        - route
+        - scope
+        - organizationId
+        - type
+      type: object
+    organizationEntitlementWithId:
+      allOf:
+        - $ref: '#/components/schemas/organizationEntitlement'
+        - description: This schema adds the ID to the entitlement.
+          properties:
+            id:
+              description: 'The ID of the entitlement in the format: {Method}{Route}{organizationId}entitlement.'
+              example: E2A6A77741910D7FC1302EC3E1F4D866DCE49CB6C42126E8B02F40CD19D23CAF
+              type: string
+          type: object
+      description: An organization-level entitlement with an associated ID.
+      required:
+        - id
+      type: object
+    restriction:
+      description: Criteria that are used to compare against a target value and determine if an action is allowed or denied.
+      properties:
+        conditions:
+          description: Contains the collection of conditions that must be met in order for the validation to happen.
+          properties:
+            and:
+              items:
+                $ref: '#/components/schemas/operator'
+              type: array
+            or:
+              items:
+                $ref: '#/components/schemas/operator'
+              type: array
+          type: object
+        validations:
+          items:
+            $ref: '#/components/schemas/operator'
+          type: array
+      type: object
+    rule:
+      description: Rule for limits.
+      properties:
+        aggregator:
+          example: count
+          type: string
+        amount:
+          $ref: '#/components/schemas/amount'
+        name:
+          example: noOfTransfers
+          type: string
+        value:
+          example: 100
+          type: number
+      type: object
+    segmentEntitlement:
+      allOf:
+        - $ref: '#/components/schemas/entitlementPatch'
+        - description: This schema adds the Segment ID to the entitlement.
+          properties:
+            scope:
+              example: segment
+              type: string
+            segmentId:
+              description: ID of the segment to which this entitlement belongs.
+              example: 06d3b551-e595-4f16-867e-601d84080768
+              type: string
+          type: object
+      description: An entitlement set at the segment level.
+      required:
+        - allow
+        - method
+        - route
+        - scope
+        - segmentId
+        - type
+      type: object
+    segmentEntitlementWithId:
+      allOf:
+        - $ref: '#/components/schemas/segmentEntitlement'
+        - description: This schema adds the ID to the entitlement.
+          properties:
+            id:
+              description: 'The ID of the entitlement in the format: {Method}{Route}{segmentId}entitlement.'
+              example: E2A6A77741910D7FC1302EC3E1F4D866DCE49CB6C42126E8B02F40CD19D23CAF
+              type: string
+          type: object
+      description: A segment-level entitlement with an associated ID.
+      required:
+        - id
+      type: object
+    systemEntitlement:
+      allOf:
+        - $ref: '#/components/schemas/entitlementPatch'
+      description: An entitlement set at the system level.
+      required:
+        - allow
+        - method
+        - route
+        - scope
+        - type
+      type: object
+    systemEntitlementWithId:
+      allOf:
+        - $ref: '#/components/schemas/systemEntitlement'
+        - description: This schema adds the ID to the entitlement.
+          properties:
+            id:
+              description: 'The ID of the entitlement in the format: {Method}{Route}entitlement.'
+              example: BED6ED6145D58CDDAF9D7EA6B3DAA058FCEB56D3B47A2F1AF18EB40945F8603C
+              type: string
+          type: object
+      description: A system-level entitlement with an associated ID.
+      required:
+        - id
+      type: object
+    tenantEntitlement:
+      allOf:
+        - $ref: '#/components/schemas/entitlementPatch'
+        - description: This schema adds the Tenant ID to the entitlement.
+          properties:
+            scope:
+              example: tenant
+              type: string
+            tenantId:
+              description: ID of the tenant to which this entitlement belongs.
+              example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+              type: string
+          type: object
+      description: An entitlement set at the tenant level.
+      required:
+        - allow
+        - method
+        - route
+        - scope
+        - tenantId
+        - type
+      type: object
+    tenantEntitlementWithId:
+      allOf:
+        - $ref: '#/components/schemas/tenantEntitlement'
+        - description: This schema adds the ID to the entitlement.
+          properties:
+            id:
+              description: 'The ID of the entitlement in the format: {Method}{Route}{tenantId}entitlement.'
+              example: E2A6A77741910D7FC1302EC3E1F4D866DCE49CB6C42126E8B02F40CD19D23CAF
+              type: string
+          type: object
+      description: A tenant-level entitlement with an associated ID.
+      required:
+        - id
+      type: object
+    userEntitlement:
+      allOf:
+        - $ref: '#/components/schemas/entitlementPatch'
+        - description: This schema adds the user ID to the entitlement.
+          properties:
+            scope:
+              example: user
+              type: string
+            userId:
+              description: ID of the user to which this entitlement belongs.
+              example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+              type: string
+          type: object
+      description: An entitlement at the user level.
+      required:
+        - allow
+        - method
+        - route
+        - scope
+        - userId
+        - type
+      type: object
+    userEntitlementWithId:
+      allOf:
+        - $ref: '#/components/schemas/userEntitlement'
+        - description: This schema adds the ID to the entitlement.
+          properties:
+            id:
+              description: 'The ID of the entitlement in the format: {Method}{Route}{userId}entitlement.'
+              example: E2A6A77741910D7FC1302EC3E1F4D866DCE49CB6C42126E8B02F40CD19D23CAF
+              type: string
+          type: object
+      description: A user-level entitlement with an associated ID.
+      required:
+        - id
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: DBP normalized JWT.
+      scheme: bearer
+      type: http
+info:
+  contact:
+    email: support@fiserv.com
+    name: Fiserv
+    url: https://fiserv.com
+  description: Routes for managing entitlements
+  title: 'Risk: Entitlements'
+  version: v1
+openapi: 3.0.3
+paths:
+  /consumer/risk/v1/entitlements/entitlementSet:
+    get:
+      description: Gets all existing entitlement sets for the organization.
+      operationId: get-consumer-risk-entitlements-entitlement-set
+      parameters:
+        - description: An optional OData (https://www.odata.org/odata-services/) query for searching/filtering entitlement sets.
+          examples:
+            nameContainsFilter:
+              value: contains(name, 'XYZ Corp')
+            nameEndsWithFilter:
+              value: endswith(name, Custom Entitlement)
+            nameExactMatchFilter:
+              value: id eq XYZ Corp Custom Entitlement
+            nameStartsWithFilter:
+              value: startswith(name, 'XYZ Corp')
+          in: query
+          name: $filter
+          required: false
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to skip specified number (n) of entries from the collection of entitlement sets and selecting only the remaining entries (starting with entry n+1). If a value less than zero is specified, the URI would be considered malformed.
+          example: 10
+          in: query
+          name: $skip
+          required: false
+          schema:
+            default: 0
+            type: integer
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to select only a subset (first n) of entries from the collection of entitlement sets. If a value less than zero is specified, the URI would be considered malformed.
+          example: 25
+          in: query
+          name: $top
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/entitlementSetArray'
+          description: Successfully retrieved the list of entitlement sets.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+    post:
+      description: Adds an entitlement set.
+      operationId: post-consumer-risk-entitlements-entitlement-set
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/entitlementSet'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/entitlementSetWithId'
+          description: Successfully created the entitlement set.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+  /consumer/risk/v1/entitlements/entitlementSet/{id}:
+    delete:
+      description: Deletes an existing entitlement set.
+      operationId: delete-consumer-risk-entitlements-entitlement-set-by-id
+      parameters:
+        - description: The ID of the entitlement set to delete.
+          in: path
+          name: id
+          required: true
+          schema:
+            format: guid
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted the entitlement set.
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+    get:
+      description: Gets an existing entitlement set.
+      operationId: get-consumer-risk-entitlements-entitlement-set-by-id
+      parameters:
+        - description: The ID of the entitlement set to get.
+          in: path
+          name: id
+          required: true
+          schema:
+            format: guid
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/entitlementSetWithId'
+          description: Successfully retrieved the entitlement set.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+    patch:
+      description: Updates an existing entitlement set.
+      operationId: patch-consumer-risk-entitlements-entitlement-set-by-id
+      parameters:
+        - description: The ID of the entitlement set to update.
+          in: path
+          name: id
+          required: true
+          schema:
+            format: guid
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            examples:
+              entitlementAddUserReplace:
+                description: Add an entitlement reference and replace a user reference.
+                value:
+                  - op: add
+                    path: /entitlements/-
+                    value: 4e10fb44-799a-4cdf-be1e-856176120b0c
+                  - op: replace
+                    path: /users/2
+                    value: ffa5e183-94ec-4419-84e2-9919b5fc6765
+            schema:
+              $ref: '#/components/schemas/jsonPatchDocument'
+          application/merge-patch+json:
+            examples:
+              entitlementAddUserReplace:
+                description: Add an entitlement reference and replace a user reference.
+                value:
+                  entitlements:
+                    - 4e10fb44-799a-4cdf-be1e-856176120b0c
+                    - ffa5e183-94ec-4419-84e2-9919b5fc6765
+                  users:
+                    - a2414ff7-ba76-4cec-9c7e-6f32ec2202a4
+                    - ffa5e183-94ec-4419-84e2-9919b5fc6763
+            schema:
+              $ref: '#/components/schemas/entitlementSet'
+      responses:
+        '204':
+          description: Successfully updated the entitlement set.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+  /consumer/risk/v1/entitlements/user:
+    get:
+      description: Gets all existing entitlements on the user level.
+      operationId: get-consumer-risk-entitlements-user
+      parameters:
+        - description: The ID of the user for which entitlements should be retrieved.
+          example: 06d3b551-e595-4f16-867e-601d84080768
+          in: query
+          name: userId
+          required: true
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) query for searching/filtering entitlements.
+          examples:
+            allowFilter:
+              value: allow eq true
+            methodFilter:
+              value: method eq POST
+            nameContainsFilter:
+              value: contains(name, 'XYZ Corp')
+            nameEndsWithFilter:
+              value: endswith(name, Custom Entitlement)
+            nameExactMatchFilter:
+              value: id eq XYZ Corp Custom Entitlement
+            nameStartsWithFilter:
+              value: startswith(name, 'XYZ Corp')
+            routeContainsFilter:
+              value: contains(route, transfer)
+            routeEndsWithFilter:
+              value: endswith(route, /transfers)
+            routeExactMatchFilter:
+              value: route eq /consumer/banking/v1/transfers
+            routeStartsWithFilter:
+              value: startswith(route, /consumer/banking)
+          in: query
+          name: $filter
+          required: false
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to skip specified number (n) of entries from the collection of entitlements and selecting only the remaining entries (starting with entry n+1). If a value less than zero is specified, the URI would be considered malformed.
+          example: 10
+          in: query
+          name: $skip
+          required: false
+          schema:
+            default: 0
+            type: integer
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to select only a subset (first n) of entitlement entries from the collection of entitlements. If a value less than zero is specified, the URI would be considered malformed.
+          example: 25
+          in: query
+          name: $top
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/userEntitlementWithId'
+                type: array
+          description: Successfully retrieved the list of entitlements.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+    post:
+      description: Adds an entitlement on the user level.
+      operationId: post-consumer-risk-entitlements-user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userEntitlement'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userEntitlementWithId'
+          description: Successfully created the entitlement.
+        '303':
+          $ref: '#/components/responses/303seeOther'
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+  /consumer/risk/v1/entitlements/user/{id}:
+    delete:
+      description: Deletes an existing entitlement on the user level.
+      operationId: delete-consumer-risk-entitlements-user-by-id
+      parameters:
+        - description: The ID of the entitlement to delete.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+    get:
+      description: Gets an existing entitlement on the user level.
+      operationId: get-consumer-risk-entitlements-user-by-id
+      parameters:
+        - description: The ID of the entitlement to retrieve.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userEntitlementWithId'
+          description: Successfully retrieved the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+    patch:
+      description: Updates an existing entitlement on the user level.
+      operationId: patch-consumer-risk-entitlements-user-by-id
+      parameters:
+        - description: The ID of the entitlement to update.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  - op: replace
+                    path: name
+                    value: Transfer Limits for the User
+                  - op: add
+                    path: /limitGroups/-
+                    value:
+                      limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+            schema:
+              $ref: '#/components/schemas/jsonPatchDocument'
+          application/merge-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  limitGroups:
+                    - limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+                  name: Transfer Limits for the User
+            schema:
+              $ref: '#/components/schemas/entitlementPatch'
+      responses:
+        '204':
+          description: Successfully updated the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-consumer
+        - resource-entitlements
+  /provider/risk/v1/entitlements/system:
+    get:
+      description: Gets all existing entitlements on the system level.
+      operationId: get-provider-risk-entitlements-system
+      parameters:
+        - description: An optional OData (https://www.odata.org/odata-services/) query for searching/filtering entitlements.
+          examples:
+            allowFilter:
+              value: allow eq true
+            methodFilter:
+              value: method eq POST
+            nameContainsFilter:
+              value: contains(name, 'XYZ Corp')
+            nameEndsWithFilter:
+              value: endswith(name, Custom Entitlement)
+            nameExactMatchFilter:
+              value: id eq XYZ Corp Custom Entitlement
+            nameStartsWithFilter:
+              value: startswith(name, 'XYZ Corp')
+            routeContainsFilter:
+              value: contains(route, transfer)
+            routeEndsWithFilter:
+              value: endswith(route, /transfers)
+            routeExactMatchFilter:
+              value: route eq /consumer/banking/v1/transfers
+            routeStartsWithFilter:
+              value: startswith(route, /consumer/banking)
+          in: query
+          name: $filter
+          required: false
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to skip specified number (n) of entries from the collection of entitlements and selecting only the remaining entries (starting with entry n+1). If a value less than zero is specified, the URI would be considered malformed.
+          example: 10
+          in: query
+          name: $skip
+          required: false
+          schema:
+            default: 0
+            type: integer
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to select only a subset (first n) of entitlement entries from the collection of entitlements. If a value less than zero is specified, the URI would be considered malformed.
+          example: 25
+          in: query
+          name: $top
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/systemEntitlementWithId'
+                type: array
+          description: Successfully retrieved the list of entitlements.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+    post:
+      description: Adds an entitlement on the system level.
+      operationId: post-provider-risk-entitlements-system
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/systemEntitlement'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/systemEntitlementWithId'
+          description: Successfully created the entitlement.
+        '303':
+          $ref: '#/components/responses/303seeOther'
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+  /provider/risk/v1/entitlements/system/{id}:
+    delete:
+      description: Deletes an existing entitlement on the system level.
+      operationId: delete-provider-risk-entitlements-system-by-id
+      parameters:
+        - description: The ID of the entitlement to delete.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+    get:
+      description: Gets an existing entitlement on the system level.
+      operationId: get-provider-risk-entitlements-system-by-id
+      parameters:
+        - description: The ID of the entitlement to retrieve.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/systemEntitlementWithId'
+          description: Successfully retrieved the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+    patch:
+      description: Updates an existing entitlement on the system level.
+      operationId: patch-provider-risk-entitlements-system-by-id
+      parameters:
+        - description: The ID of the entitlement to update.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  - op: replace
+                    path: name
+                    value: Transfer Limits for the System
+                  - op: add
+                    path: /limitGroups/-
+                    value:
+                      limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+            schema:
+              $ref: '#/components/schemas/jsonPatchDocument'
+          application/merge-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  limitGroups:
+                    - limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+                  name: Transfer Limits for the System
+            schema:
+              $ref: '#/components/schemas/entitlementPatch'
+      responses:
+        '204':
+          description: Successfully updated the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+  /provider/risk/v1/entitlements/tenant:
+    get:
+      description: Gets all existing entitlements on the tenant level.
+      operationId: get-provider-risk-entitlements-tenant
+      parameters:
+        - description: The ID of the tenant for which entitlements should be retrieved.
+          example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+          in: query
+          name: tenantId
+          required: true
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) query for searching/filtering entitlements.
+          examples:
+            allowFilter:
+              value: allow eq true
+            methodFilter:
+              value: method eq POST
+            nameContainsFilter:
+              value: contains(name, 'XYZ Corp')
+            nameEndsWithFilter:
+              value: endswith(name, Custom Entitlement)
+            nameExactMatchFilter:
+              value: id eq XYZ Corp Custom Entitlement
+            nameStartsWithFilter:
+              value: startswith(name, 'XYZ Corp')
+            routeContainsFilter:
+              value: contains(route, transfer)
+            routeEndsWithFilter:
+              value: endswith(route, /transfers)
+            routeExactMatchFilter:
+              value: route eq /consumer/banking/v1/transfers
+            routeStartsWithFilter:
+              value: startswith(route, /consumer/banking)
+          in: query
+          name: $filter
+          required: false
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to skip specified number (n) of entries from the collection of entitlements and selecting only the remaining entries (starting with entry n+1). If a value less than zero is specified, the URI would be considered malformed.
+          example: 10
+          in: query
+          name: $skip
+          required: false
+          schema:
+            default: 0
+            type: integer
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to select only a subset (first n) of entitlement entries from the collection of entitlements. If a value less than zero is specified, the URI would be considered malformed.
+          example: 25
+          in: query
+          name: $top
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/tenantEntitlementWithId'
+                type: array
+          description: Successfully retrieved the list of entitlements.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+    post:
+      description: Adds an entitlement on the tenant level.
+      operationId: post-provider-risk-entitlements-tenant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tenantEntitlement'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tenantEntitlementWithId'
+          description: Successfully created the entitlement.
+        '303':
+          $ref: '#/components/responses/303seeOther'
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+  /provider/risk/v1/entitlements/tenant/{id}:
+    delete:
+      description: Deletes an existing entitlement on the tenant level.
+      operationId: delete-provider-risk-entitlements-tenant-by-id
+      parameters:
+        - description: The ID of the tenant for which the entitlement should be deleted.
+          example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+          in: query
+          name: tenantId
+          required: true
+          schema:
+            type: string
+        - description: The ID of the entitlement to delete.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+    get:
+      description: Gets an existing entitlement on the tenant level.
+      operationId: get-provider-risk-entitlements-tenant-by-id
+      parameters:
+        - description: The ID of the tenant for which the entitlement should be retrieved.
+          example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+          in: query
+          name: tenantId
+          required: true
+          schema:
+            type: string
+        - description: The ID of the entitlement to retrieve.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tenantEntitlementWithId'
+          description: Successfully retrieved the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+    patch:
+      description: Updates an existing entitlement on the tenant level.
+      operationId: patch-provider-risk-entitlements-tenant-by-id
+      parameters:
+        - description: The ID of the tenant for which the entitlement should be patched.
+          example: ffa5e183-94ec-4419-84e2-9919b5fc6763
+          in: query
+          name: tenantId
+          required: true
+          schema:
+            type: string
+        - description: The ID of the entitlement to update.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  - op: replace
+                    path: name
+                    value: Transfer Limits for the Tenant
+                  - op: add
+                    path: /limitGroups/-
+                    value:
+                      limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+            schema:
+              $ref: '#/components/schemas/jsonPatchDocument'
+          application/merge-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  limitGroups:
+                    - limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+                  name: Transfer Limits for the Tenant
+            schema:
+              $ref: '#/components/schemas/entitlementPatch'
+      responses:
+        '204':
+          description: Successfully updated the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-provider
+        - resource-entitlements
+  /tenant/risk/v1/entitlements/organization:
+    get:
+      description: Gets all existing entitlements on the organization level.
+      operationId: get-tenant-risk-entitlements-organization
+      parameters:
+        - description: The ID of the organization for which entitlements should be retrieved.
+          example: 06d3b551-e595-4f16-867e-601d84080768
+          in: query
+          name: organizationId
+          required: true
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) query for searching/filtering entitlements.
+          examples:
+            allowFilter:
+              value: allow eq true
+            methodFilter:
+              value: method eq POST
+            nameContainsFilter:
+              value: contains(name, 'XYZ Corp')
+            nameEndsWithFilter:
+              value: endswith(name, Custom Entitlement)
+            nameExactMatchFilter:
+              value: id eq XYZ Corp Custom Entitlement
+            nameStartsWithFilter:
+              value: startswith(name, 'XYZ Corp')
+            routeContainsFilter:
+              value: contains(route, transfer)
+            routeEndsWithFilter:
+              value: endswith(route, /transfers)
+            routeExactMatchFilter:
+              value: route eq /consumer/banking/v1/transfers
+            routeStartsWithFilter:
+              value: startswith(route, /consumer/banking)
+            typeFilter:
+              value: type eq entitlementSetMember
+          in: query
+          name: $filter
+          required: false
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to skip specified number (n) of entries from the collection of entitlements and selecting only the remaining entries (starting with entry n+1). If a value less than zero is specified, the URI would be considered malformed.
+          example: 10
+          in: query
+          name: $skip
+          required: false
+          schema:
+            default: 0
+            type: integer
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to select only a subset (first n) of entitlement entries from the collection of entitlements. If a value less than zero is specified, the URI would be considered malformed.
+          example: 25
+          in: query
+          name: $top
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/organizationEntitlementWithId'
+                type: array
+          description: Successfully retrieved the list of entitlements.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+    post:
+      description: Adds an entitlement on the organization level.
+      operationId: post-tenant-risk-entitlements-organization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/organizationEntitlement'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationEntitlementWithId'
+          description: Successfully created the entitlement.
+        '303':
+          $ref: '#/components/responses/303seeOther'
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+  /tenant/risk/v1/entitlements/organization/{id}:
+    delete:
+      description: Deletes an existing entitlement on the organization level.
+      operationId: delete-tenant-risk-entitlements-organization-by-id
+      parameters:
+        - description: The ID of the entitlement to delete.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+    get:
+      description: Gets an existing entitlement on the organization level.
+      operationId: get-tenant-risk-entitlements-organization-by-id
+      parameters:
+        - description: The ID of the entitlement to retrieve.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/organizationEntitlementWithId'
+          description: Successfully retrieved the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+    patch:
+      description: Updates an existing entitlement on the organization level.
+      operationId: patch-tenant-risk-entitlements-organization-by-id
+      parameters:
+        - description: The ID of the entitlement to update.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  - op: replace
+                    path: name
+                    value: Transfer Limits for the Organization
+                  - op: add
+                    path: /limitGroups/-
+                    value:
+                      limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+            schema:
+              $ref: '#/components/schemas/jsonPatchDocument'
+          application/merge-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  limitGroups:
+                    - limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+                  name: Transfer Limits for the Organization
+            schema:
+              $ref: '#/components/schemas/entitlementPatch'
+      responses:
+        '204':
+          description: Successfully updated the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+  /tenant/risk/v1/entitlements/segment:
+    get:
+      description: Gets all existing entitlements on the segment level.
+      operationId: get-tenant-risk-entitlements-segment
+      parameters:
+        - description: The ID of the segment for which entitlements should be retrieved.
+          example: 06d3b551-e595-4f16-867e-601d84080768
+          in: query
+          name: segmentId
+          required: true
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) query for searching/filtering entitlements.
+          examples:
+            allowFilter:
+              value: allow eq true
+            methodFilter:
+              value: method eq POST
+            nameContainsFilter:
+              value: contains(name, 'XYZ Corp')
+            nameEndsWithFilter:
+              value: endswith(name, Custom Entitlement)
+            nameExactMatchFilter:
+              value: id eq XYZ Corp Custom Entitlement
+            nameStartsWithFilter:
+              value: startswith(name, 'XYZ Corp')
+            routeContainsFilter:
+              value: contains(route, transfer)
+            routeEndsWithFilter:
+              value: endswith(route, /transfers)
+            routeExactMatchFilter:
+              value: route eq /consumer/banking/v1/transfers
+            routeStartsWithFilter:
+              value: startswith(route, /consumer/banking)
+          in: query
+          name: $filter
+          required: false
+          schema:
+            type: string
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to skip specified number (n) of entries from the collection of entitlements and selecting only the remaining entries (starting with entry n+1). If a value less than zero is specified, the URI would be considered malformed.
+          example: 10
+          in: query
+          name: $skip
+          required: false
+          schema:
+            default: 0
+            type: integer
+        - description: An optional OData (https://www.odata.org/odata-services/) parameter to select only a subset (first n) of entitlement entries from the collection of entitlements. If a value less than zero is specified, the URI would be considered malformed.
+          example: 25
+          in: query
+          name: $top
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/segmentEntitlementWithId'
+                type: array
+          description: Successfully retrieved the list of entitlements.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+    post:
+      description: Adds an entitlement on the segment level.
+      operationId: post-tenant-risk-entitlements-segment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/segmentEntitlement'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/segmentEntitlementWithId'
+          description: Successfully created the entitlement.
+        '303':
+          $ref: '#/components/responses/303seeOther'
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+  /tenant/risk/v1/entitlements/segment/{id}:
+    delete:
+      description: Deletes an existing entitlement on the segment level.
+      operationId: delete-tenant-risk-entitlements-segment-by-id
+      parameters:
+        - description: The ID of the entitlement to delete.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+    get:
+      description: Gets an existing entitlement on the segment level.
+      operationId: get-tenant-risk-entitlements-segment-by-id
+      parameters:
+        - description: The ID of the entitlement to retrieve.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/segmentEntitlementWithId'
+          description: Successfully retrieved the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+    patch:
+      description: Updates an existing entitlement on the segment level.
+      operationId: patch-tenant-risk-entitlements-segment-by-id
+      parameters:
+        - description: The ID of the entitlement to update.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  - op: replace
+                    path: name
+                    value: Transfer Limits for the Segment
+                  - op: add
+                    path: /limitGroups/-
+                    value:
+                      limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+            schema:
+              $ref: '#/components/schemas/jsonPatchDocument'
+          application/merge-patch+json:
+            examples:
+              modifyRestrictionsAndLimits:
+                description: Update the name and add a limit on an entitlement.
+                value:
+                  limitGroups:
+                    - limits:
+                        - conditions:
+                            and:
+                              - name: transfer.type
+                                operator: in
+                                values:
+                                  - PPD
+                          period: yearly
+                          rules:
+                            - aggregator: sum
+                              amount:
+                                currency: USD
+                                value: 100000
+                              name: amount.value
+                      scheme: transfer
+                  name: Transfer Limits for the Segment
+            schema:
+              $ref: '#/components/schemas/entitlementPatch'
+      responses:
+        '204':
+          description: Successfully updated the entitlement.
+        '400':
+          $ref: '#/components/responses/400badRequest'
+        '401':
+          $ref: '#/components/responses/401unauthorized'
+        '403':
+          $ref: '#/components/responses/403forbidden'
+        '404':
+          $ref: '#/components/responses/404notFound'
+        '422':
+          $ref: '#/components/responses/422unprocessableEntity'
+      tags:
+        - context-risk
+        - party-tenant
+        - resource-entitlements
+security:
+  - bearerAuth: []
+servers:
+  - description: Fiserv API
+    url: https://api.fiserv.com
+tags:
+  - description: Risk bounded context.
+    name: context-risk
+  - description: Consumer/client application operations.
+    name: party-consumer
+  - description: Service provider operations.
+    name: party-provider
+  - description: Tenant-scoped operations.
+    name: party-tenant
+  - description: Entitlements and authorization.
+    name: resource-entitlements
+x-apigee-proxy:
+  postflow:
+    response:
+      - name: Response-Header-Update
+  preflow:
+    request:
+      - name: Request-Authentication-Verification
+      - name: Request-Header-Update

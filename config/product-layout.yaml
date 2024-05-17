@@ -28,21 +28,22 @@
 # the delivery of this work
 ################################################################################
 header:
-  productName: REPLACEME
-  productionDescription: REPLACEME
-  whoIsItFor: REPLACEME
+  productName: Banking Risk
+  productionDescription: Create a Banking Hub workspace today for free with instant access to APIs for Fiserv account processing platforms and related banking tech. In minutes, you can begin exploring and experimenting with our APIs – accelerating the path to bringing your pre-integrated financial innovations to market.
+  whoIsItFor: Developers seeking to create apps and integrate them to Fiserv banking solutions. 
   image: 
     link: "/assets/images/Fiserv_Logo.jpg"
     altText: REPLACEME™
 featuredFeatures:
-  - title: REPLACE ME
-    description:  REPLACE ME
-    tags: ["REPLACEME", "REPLACEME", "REPLACEME"]
-    bullets: ["REPLACEME", "REPLACEME" ]  
+  - title: Authorization Service 
+    description:  The authorization service is the backbone of the entitlements part of the risk domain. It acts as the principal decision-maker for whether requests are granted or rejected. It's bound to Istio/Envoy via an Open Police Agent sidecar which will relay the authorization request on the authorization service.
+    tags: []
+    bullets: []  
+    #links: ["docs/fintechs/risk.md"]
     relatedDocs:
       - relatedDoc: 
-        title: REPLACEME
-        description: REPLACEME
+        title: Common Use Cases
+        description: This document covers common use cases 
         link: ./docs/REPLACE-ME1.md
       - relatedDoc: 
         title: REPLACEME
