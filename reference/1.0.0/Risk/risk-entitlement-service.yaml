@@ -782,6 +782,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Get Endpoints   
   /consumer/risk/v1/entitlements/entitlementSet:
     get:
       description: Gets all existing entitlement sets for the organization.
