@@ -866,6 +866,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Post Entitlement Set
   /consumer/risk/v1/entitlements/entitlementSet/{id}:
     delete:
       description: Deletes an existing entitlement set.
@@ -923,6 +924,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Delete Entitlement Set
     patch:
       description: Updates an existing entitlement set.
       operationId: patch-consumer-risk-entitlements-entitlement-set-by-id
@@ -1050,7 +1052,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
-      x-proxy-name: User Entitlement 
+      x-proxy-name: Get User Entitlement 
     post:
       description: Adds an entitlement on the user level.
       operationId: post-consumer-risk-entitlements-user
@@ -1109,6 +1111,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Delete User Entitlement
     get:
       description: Gets an existing entitlement on the user level.
       operationId: get-consumer-risk-entitlements-user-by-id
@@ -1138,6 +1141,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Get User Entitlement
     patch:
       description: Updates an existing entitlement on the user level.
       operationId: patch-consumer-risk-entitlements-user-by-id
@@ -1220,6 +1224,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Update Entitlement 
   /provider/risk/v1/entitlements/composite:
     get:
       description: Gets a composite entitlement on either the segment or user level.
@@ -1273,7 +1278,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
-      x-proxy-name: Endpoints
+      x-proxy-name: Get Composite
   /provider/risk/v1/entitlements/endpoints:
     post:
       description: Parses an OpenAPI schema file and finds distinct combinations of HTTP methods/verbs and routes and turns them into endpoint catalog entries. This endpoint can be called multiple times and will keep adding entries, this is so it's possible to support multiple schema files like `/swagger/v1/swagger.json`, `/swagger/v2/swagger.json` etc. Just make sure the same `version` parameter is passed for each call so they can later all be promoted together.
@@ -1298,7 +1303,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
-      x-proxy-name: Endpoints Promote
+      x-proxy-name: Endpoints 
   /provider/risk/v1/entitlements/endpoints/promote:
     post:
       description: 'Promotes endpoint catalog entries matching the `service` and `version` parameters supplied setting `active: true`. After promoting the new entires it will delete all old entries matching the `service` parameter supplied but not matching the `version` parameter supplied.'
@@ -1323,6 +1328,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Endpoint Promote
   /provider/risk/v1/entitlements/system:
     get:
       description: Gets all existing entitlements on the system level.
@@ -1421,6 +1427,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Post System Entitlement
   /provider/risk/v1/entitlements/system/{id}:
     delete:
       description: Deletes an existing entitlement on the system level.
@@ -1447,7 +1454,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
-      x-proxy-name: Get Entitlements
+      x-proxy-name: Delete System Entitlement
     get:
       description: Gets an existing entitlement on the system level.
       operationId: get-provider-risk-entitlements-system-by-id
@@ -1477,6 +1484,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Get by ID System Entitlement
     patch:
       description: Updates an existing entitlement on the system level.
       operationId: patch-provider-risk-entitlements-system-by-id
@@ -1558,6 +1566,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Patch System Entitlement
   /provider/risk/v1/entitlements/tenant:
     get:
       description: Gets all existing entitlements on the tenant level.
@@ -1627,7 +1636,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
-      x-proxy-name: Tenant Entitlement
+      x-proxy-name: Get Tenant Entitlement
     post:
       description: Adds an entitlement on the tenant level.
       operationId: post-provider-risk-entitlements-tenant
@@ -1657,6 +1666,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Post Tenant Entitlement
   /provider/risk/v1/entitlements/tenant/{id}:
     delete:
       description: Deletes an existing entitlement on the tenant level.
@@ -1684,6 +1694,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Delete Tenant Entitlement
     get:
       description: Gets an existing entitlement on the tenant level.
       operationId: get-provider-risk-entitlements-tenant-by-id
@@ -1714,6 +1725,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Get Tenant Entitlement
     patch:
       description: Updates an existing entitlement on the tenant level.
       operationId: patch-provider-risk-entitlements-tenant-by-id
@@ -1796,6 +1808,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Patch Tenant Entitlement 
   /tenant/risk/v1/entitlements/organization:
     get:
       description: Gets all existing entitlements on the organization level.
@@ -1877,7 +1890,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
-      x-proxy-name: Organization Entitlement 
+      x-proxy-name: Get Organization Entitlement 
     post:
       description: Adds an entitlement on the organization level.
       operationId: post-tenant-risk-entitlements-organization
@@ -1907,6 +1920,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Post Organization Entitlement
   /tenant/risk/v1/entitlements/organization/{id}:
     delete:
       description: Deletes an existing entitlement on the organization level.
@@ -1934,6 +1948,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Delete Organization Entitlement
     get:
       description: Gets an existing entitlement on the organization level.
       operationId: get-tenant-risk-entitlements-organization-by-id
@@ -1964,6 +1979,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Get Organization entitlement
     patch:
       description: Updates an existing entitlement on the organization level.
       operationId: patch-tenant-risk-entitlements-organization-by-id
@@ -2046,6 +2062,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Update Organization Entitlement
   /tenant/risk/v1/entitlements/segment:
     get:
       description: Gets all existing entitlements on the segment level.
@@ -2145,6 +2162,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Post Segment Entitlement
   /tenant/risk/v1/entitlements/segment/{id}:
     delete:
       description: Deletes an existing entitlement on the segment level.
@@ -2171,6 +2189,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Delete Segment Entitlement
     get:
       description: Gets an existing entitlement on the segment level.
       operationId: get-tenant-risk-entitlements-segment-by-id
@@ -2200,6 +2219,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Get Segment Entitlement
     patch:
       description: Updates an existing entitlement on the segment level.
       operationId: patch-tenant-risk-entitlements-segment-by-id
@@ -2281,6 +2301,7 @@ paths:
         - context-risk
         - party-tenant
         - resource-entitlements
+      x-proxy-name: Update Segment Entitlement
 security:
   - bearerAuth: []
 servers:
