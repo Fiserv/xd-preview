@@ -893,6 +893,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Delete Entitlement Set
     get:
       description: Gets an existing entitlement set.
       operationId: get-consumer-risk-entitlements-entitlement-set-by-id
