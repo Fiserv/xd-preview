@@ -1269,6 +1269,7 @@ paths:
         - context-risk
         - party-provider
         - resource-entitlements
+      x-proxy-name: Endpoints
   /provider/risk/v1/entitlements/endpoints:
     post:
       description: Parses an OpenAPI schema file and finds distinct combinations of HTTP methods/verbs and routes and turns them into endpoint catalog entries. This endpoint can be called multiple times and will keep adding entries, this is so it's possible to support multiple schema files like `/swagger/v1/swagger.json`, `/swagger/v2/swagger.json` etc. Just make sure the same `version` parameter is passed for each call so they can later all be promoted together.
