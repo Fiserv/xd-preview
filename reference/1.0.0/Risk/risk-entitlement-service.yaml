@@ -980,6 +980,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Update Entitlement Set     
   /consumer/risk/v1/entitlements/user:
     get:
       description: Gets all existing entitlements on the user level.
