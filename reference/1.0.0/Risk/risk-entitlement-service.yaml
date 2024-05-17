@@ -1085,6 +1085,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+      x-proxy-name: Delete Card
   /consumer/risk/v1/entitlements/user/{id}:
     delete:
       description: Deletes an existing entitlement on the user level.
