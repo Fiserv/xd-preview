@@ -783,7 +783,8 @@ paths:
         - party-consumer
         - resource-entitlements
       x-group-name: Entitlement Service
-      x-proxy-name: Get Endpoints   
+      x-proxy-name: Get Endpoints 
+      x-child-product-name: Entitlements  
   /consumer/risk/v1/entitlements/entitlementSet:
     get:
       description: Gets all existing entitlement sets for the organization.
@@ -841,6 +842,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get Entitlement Set
+      x-child-product-name: Entitlements  
     post:
       description: Adds an entitlement set.
       operationId: post-consumer-risk-entitlements-entitlement-set
@@ -870,6 +872,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Add Entitlement Set
+      x-child-product-name: Entitlements  
   /consumer/risk/v1/entitlements/entitlementSet/{id}:
     delete:
       description: Deletes an existing entitlement set.
@@ -898,6 +901,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Delete Entitlement Set
+      x-child-product-name: Entitlements  
     get:
       description: Gets an existing entitlement set.
       operationId: get-consumer-risk-entitlements-entitlement-set-by-id
@@ -931,6 +935,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Delete Entitlement Set
+      x-child-product-name: Entitlements  
     patch:
       description: Updates an existing entitlement set.
       operationId: patch-consumer-risk-entitlements-entitlement-set-by-id
@@ -989,7 +994,8 @@ paths:
         - party-consumer
         - resource-entitlements
       x-group-name: Entitlement Service
-      x-proxy-name: Update Entitlement Set     
+      x-proxy-name: Update Entitlement Set  
+      x-child-product-name: Entitlements     
   /consumer/risk/v1/entitlements/user:
     get:
       description: Gets all existing entitlements on the user level.
@@ -1061,6 +1067,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get User Entitlement 
+      x-child-product-name: Entitlements  
     post:
       description: Adds an entitlement on the user level.
       operationId: post-consumer-risk-entitlements-user
@@ -1094,6 +1101,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Add User Entitlement
+      x-child-product-name: Entitlements  
   /consumer/risk/v1/entitlements/user/{id}:
     delete:
       description: Deletes an existing entitlement on the user level.
@@ -1123,6 +1131,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Delete User Entitlement
+      x-child-product-name: Entitlements  
     get:
       description: Gets an existing entitlement on the user level.
       operationId: get-consumer-risk-entitlements-user-by-id
@@ -1154,6 +1163,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get User Entitlement
+      x-child-product-name: Entitlements  
     patch:
       description: Updates an existing entitlement on the user level.
       operationId: patch-consumer-risk-entitlements-user-by-id
@@ -1238,6 +1248,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Update User Entitlement 
+      x-child-product-name: Entitlements  
   /provider/risk/v1/entitlements/composite:
     get:
       description: Gets a composite entitlement on either the segment or user level.
@@ -1293,6 +1304,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get Composite Entitlement
+      x-child-product-name: Entitlements  
   /provider/risk/v1/entitlements/endpoints:
     post:
       description: Parses an OpenAPI schema file and finds distinct combinations of HTTP methods/verbs and routes and turns them into endpoint catalog entries. This endpoint can be called multiple times and will keep adding entries, this is so it's possible to support multiple schema files like `/swagger/v1/swagger.json`, `/swagger/v2/swagger.json` etc. Just make sure the same `version` parameter is passed for each call so they can later all be promoted together.
@@ -1319,6 +1331,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Add Endpoints 
+      x-child-product-name: Entitlements  
   /provider/risk/v1/entitlements/endpoints/promote:
     post:
       description: 'Promotes endpoint catalog entries matching the `service` and `version` parameters supplied setting `active: true`. After promoting the new entires it will delete all old entries matching the `service` parameter supplied but not matching the `version` parameter supplied.'
@@ -1345,6 +1358,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Endpoint Promote
+      x-child-product-name: Entitlements  
   /provider/risk/v1/entitlements/system:
     get:
       description: Gets all existing entitlements on the system level.
@@ -1415,6 +1429,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get System Entitlement
+      x-child-product-name: Entitlements  
     post:
       description: Adds an entitlement on the system level.
       operationId: post-provider-risk-entitlements-system
@@ -1446,6 +1461,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Add System Entitlement
+      x-child-product-name: Entitlements  
   /provider/risk/v1/entitlements/system/{id}:
     delete:
       description: Deletes an existing entitlement on the system level.
@@ -1474,6 +1490,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Delete System Entitlement
+      x-child-product-name: Entitlements  
     get:
       description: Gets an existing entitlement on the system level.
       operationId: get-provider-risk-entitlements-system-by-id
@@ -1505,6 +1522,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get by ID System Entitlement
+      x-child-product-name: Entitlements  
     patch:
       description: Updates an existing entitlement on the system level.
       operationId: patch-provider-risk-entitlements-system-by-id
@@ -1588,6 +1606,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Update System Entitlement
+      x-child-product-name: Entitlements  
   /provider/risk/v1/entitlements/tenant:
     get:
       description: Gets all existing entitlements on the tenant level.
@@ -1659,6 +1678,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get Tenant Entitlement
+      x-child-product-name: Entitlements  
     post:
       description: Adds an entitlement on the tenant level.
       operationId: post-provider-risk-entitlements-tenant
@@ -1690,6 +1710,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Add Tenant Entitlement
+      x-child-product-name: Entitlements  
   /provider/risk/v1/entitlements/tenant/{id}:
     delete:
       description: Deletes an existing entitlement on the tenant level.
@@ -1719,6 +1740,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Delete Tenant Entitlement
+      x-child-product-name: Entitlements  
     get:
       description: Gets an existing entitlement on the tenant level.
       operationId: get-provider-risk-entitlements-tenant-by-id
@@ -1751,6 +1773,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service  
       x-proxy-name: Get Tenant Entitlement
+      x-child-product-name: Entitlements  
     patch:
       description: Updates an existing entitlement on the tenant level.
       operationId: patch-provider-risk-entitlements-tenant-by-id
@@ -1835,6 +1858,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Update Tenant Entitlement 
+      x-child-product-name: Entitlements  
   /tenant/risk/v1/entitlements/organization:
     get:
       description: Gets all existing entitlements on the organization level.
@@ -1918,6 +1942,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get Organization Entitlement 
+      x-child-product-name: Entitlements  
     post:
       description: Adds an entitlement on the organization level.
       operationId: post-tenant-risk-entitlements-organization
@@ -1949,6 +1974,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Add Organization Entitlement
+      x-child-product-name: Entitlements  
   /tenant/risk/v1/entitlements/organization/{id}:
     delete:
       description: Deletes an existing entitlement on the organization level.
@@ -1978,6 +2004,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Delete Organization Entitlement
+      x-child-product-name: Entitlements  
     get:
       description: Gets an existing entitlement on the organization level.
       operationId: get-tenant-risk-entitlements-organization-by-id
@@ -2010,6 +2037,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get Organization entitlement
+      x-child-product-name: Entitlements  
     patch:
       description: Updates an existing entitlement on the organization level.
       operationId: patch-tenant-risk-entitlements-organization-by-id
@@ -2094,6 +2122,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Update Organization Entitlement
+      x-child-product-name: Entitlements  
   /tenant/risk/v1/entitlements/segment:
     get:
       description: Gets all existing entitlements on the segment level.
@@ -2165,6 +2194,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get Segment Entitlement
+      x-child-product-name: Entitlements  
     post:
       description: Adds an entitlement on the segment level.
       operationId: post-tenant-risk-entitlements-segment
@@ -2196,6 +2226,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Add Segment Entitlement
+      x-child-product-name: Entitlements  
   /tenant/risk/v1/entitlements/segment/{id}:
     delete:
       description: Deletes an existing entitlement on the segment level.
@@ -2224,6 +2255,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Delete Segment Entitlement
+      x-child-product-name: Entitlements  
     get:
       description: Gets an existing entitlement on the segment level.
       operationId: get-tenant-risk-entitlements-segment-by-id
@@ -2255,6 +2287,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Get by ID Segment Entitlement
+      x-child-product-name: Entitlements  
     patch:
       description: Updates an existing entitlement on the segment level.
       operationId: patch-tenant-risk-entitlements-segment-by-id
@@ -2338,6 +2371,7 @@ paths:
         - resource-entitlements
       x-group-name: Entitlement Service
       x-proxy-name: Update Segment Entitlement
+      x-child-product-name: Entitlements  
 security:
   - bearerAuth: []
 servers:
