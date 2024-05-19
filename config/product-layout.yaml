@@ -41,18 +41,21 @@ featuredFeatures:
     bullets: []  
     #links: ["docs/fintechs/risk.md"]
     relatedDocs:
-      - relatedDoc: 
-        title: Common Use Cases
-        description: This document covers common use cases 
-        link: ./docs/REPLACE-ME1.md
-      - relatedDoc: 
-        title: REPLACEME
-        description: REPLACEME
-        link: ./docs/REPLACE-ME2.md
-      - relatedDoc: 
-        title: REPLACEME
-        description: REPLACEME
-        link: ./docs/REPLACE-ME3.md
+      - relatedAPI: 
+        title: Add System Entitlement 
+        description: Creates a system level entitlement 
+        type: "post"        
+        path: "/provider/risk/v1/entitlements/system"
+      - relatedAPI: 
+        title: Get System Entitlement 
+        description: Retrieves system level entitlement
+        type: "get"        
+        path: "/provider/risk/v1/entitlements/system"
+      - relatedAPI: 
+        title: Get by ID System Entitlement 
+        description: Retrieves specific system level entitlement
+        type: "get"        
+        path: "/provider/risk/v1/entitlements/system/{id}"
     relatedAPIs:
       - relatedAPI: 
         title: REPLACEME

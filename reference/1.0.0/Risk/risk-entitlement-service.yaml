@@ -782,6 +782,7 @@ paths:
         - context-risk
         - party-consumer
         - resource-entitlements
+        - Get Endpoints
       x-group-name: Entitlement Service
       x-proxy-name: Get Endpoints 
       x-child-product-name: Entitlements  
